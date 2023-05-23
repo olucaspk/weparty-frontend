@@ -25,7 +25,7 @@ import {
   User,
   X,
   type Icon as LucideIcon,
-} from "lucide-react"
+} from 'lucide-react'
 
 export type Icon = LucideIcon
 
