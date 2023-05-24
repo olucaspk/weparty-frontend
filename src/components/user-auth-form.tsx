@@ -1,5 +1,11 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { signIn } from 'next-auth/react'
+import * as React from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -13,18 +19,7 @@ import { Icons } from '@/components/ui/icons'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { cn } from '@/lib/utils'
-import { api } from '@/services/api'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as React from 'react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-const formSchema = z.object({
-  email: z.string().min(1, 'Campo obrigatório').email('Email inválido'),
-  password: z.string().min(1, 'Campo obrigatório'),
-})
+import { useRouter, useSearchParams } from 'next/navigation'
 
 const formFields = [
   {
@@ -41,34 +36,50 @@ const formFields = [
   },
 ] as const
 
-export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const { toast } = useToast()
-  // const { push } = useRouter()
+const userAuthFormSchema = z.object({
+  email: z.string().min(1, 'Campo obrigatório').email('Email inválido'),
+  password: z.string().min(1, 'Campo obrigatório'),
+})
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+type FormData = z.infer<typeof userAuthFormSchema>
+
+export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+  const { toast } = useToast()
+  const { push } = useRouter()
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const searchParams = useSearchParams()
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(userAuthFormSchema),
     defaultValues: {
       email: '',
       password: '',
     },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { email, password } = values
+  async function onSubmit(data: FormData) {
     setIsLoading(true)
 
-    try {
-      const response = await api.post('/user/signin', { email, password })
-      const data = response.data
-      console.log('oi', data)
-    } catch (err: any) {
-      toast({
+    const signInResult = await signIn('credentials', {
+      email: data.email.toLowerCase(),
+      password: data.password,
+      redirect: false,
+      callbackUrl: searchParams?.get('from') || '/dashboard',
+    })
+
+    setIsLoading(false)
+
+    if (!signInResult?.ok) {
+      return toast({
         title: 'Ups! Algo deu errado',
-        description: 'Verifique suas credenciais e tente novamente',
+        description: 'Verifique suas credenciais e tente novamente.',
+        variant: 'destructive',
       })
-      setIsLoading(false)
     }
+
+    push(signInResult.url ?? '/dashboard')
   }
 
   return (
