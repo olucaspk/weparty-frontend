@@ -22,8 +22,8 @@ import * as z from 'zod'
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const formSchema = z.object({
-  email: z.string().min(1, 'Campo de email vázio').email('Email inválido'),
-  password: z.string().min(1, 'Campo de senha vázio'),
+  email: z.string().min(1, 'Campo obrigatório').email('Email inválido'),
+  password: z.string().min(1, 'Campo obrigatório'),
 })
 
 const formFields = [
@@ -31,7 +31,7 @@ const formFields = [
     name: 'email',
     label: 'Email',
     type: 'string',
-    placeholder: 'mail@weparty.gg',
+    placeholder: 'john@weparty.gg',
   },
   {
     name: 'password',
