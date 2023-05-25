@@ -1,10 +1,17 @@
 import '@/assets/css/globals.css'
 import { Toaster } from '@/components/ui/toaster'
 import { siteConfig } from '@/config/site'
-import { Inter } from 'next/font/google'
+import { Inter as FontSans } from 'next/font/google'
 import React from 'react'
 
-const inter = Inter({ subsets: ['latin'] })
+import { cn } from '@/lib/utils'
+import localFont from 'next/font/local'
+
+const fontSans = FontSans({ subsets: ['latin'], variable: '--font-sans' })
+const fontHeading = localFont({
+  src: '../assets/fonts/CalSans-SemiBold.woff2',
+  variable: '--font-heading',
+})
 
 export const metadata = {
   title: {
@@ -46,7 +53,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased',
+          fontSans.variable,
+          fontHeading.variable,
+        )}
+      >
         {children}
         <Toaster />
       </body>
