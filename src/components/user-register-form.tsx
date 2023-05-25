@@ -54,17 +54,13 @@ const formFields = [
   },
 ] as const
 
-const userRegisterFormSchema = z
-  .object({
-    name: z.string().min(1, 'Campo obrigatório'),
-    lastname: z.string().min(1, 'Campo obrigatório'),
-    email: z.string().min(1, 'Campo obrigatório').email('Email inválido'),
-    password: z.string().min(1, 'Campo obrigatório'),
-    confirmPassword: z.string().min(1, 'Campo obrigatório'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Senhas não coincidem',
-  })
+const userRegisterFormSchema = z.object({
+  name: z.string().min(1, 'Campo obrigatório'),
+  lastname: z.string().min(1, 'Campo obrigatório'),
+  email: z.string().min(1, 'Campo obrigatório').email('Email inválido'),
+  password: z.string().min(1, 'Campo obrigatório'),
+  confirmPassword: z.string().min(1, 'Campo obrigatório'),
+})
 
 interface UserRegisterFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 type FormData = z.infer<typeof userRegisterFormSchema>
@@ -91,13 +87,27 @@ export function UserRegisterForm({
   async function onSubmit(data: FormData) {
     setIsLoading(true)
 
+    if (data.password !== data.confirmPassword) {
+      setIsLoading(false)
+      return toast({
+        title: 'Ups! Algo deu errado',
+        description: 'Senhas não coincidem',
+        variant: 'destructive',
+      })
+    }
+
     try {
       await api.post('/user/create', {
         name: data.name,
         lastname: data.lastname,
-        dob: 'test',
+        dob: new Date(),
         email: data.email,
         password: data.password,
+      })
+
+      toast({
+        title: 'Cadastro realizado com sucesso!',
+        description: 'Você já pode fazer login na plataforma.',
       })
 
       push('/signin')
