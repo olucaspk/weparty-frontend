@@ -30,7 +30,7 @@ export default withAuth(
     }
 
     if (
-      token.role === 'MEMBER' &&
+      token.role === 'USER' &&
       req.nextUrl.pathname.startsWith('/dashboard')
     ) {
       return NextResponse.redirect(new URL('/beta', req.url))
