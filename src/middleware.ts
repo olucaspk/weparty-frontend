@@ -28,6 +28,13 @@ export default withAuth(
         new URL(`/signin?from=${encodeURIComponent(from)}`, req.url),
       )
     }
+
+    if (
+      token.role === 'MEMBER' &&
+      req.nextUrl.pathname.startsWith('/dashboard')
+    ) {
+      return NextResponse.redirect(new URL('/beta', req.url))
+    }
   },
   {
     callbacks: {

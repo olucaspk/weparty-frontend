@@ -1,5 +1,6 @@
 'use client'
 
+import { signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { EmptyPlaceholder } from './empty-placeholder'
 import { Button } from './ui/button'
@@ -15,7 +16,19 @@ export default function BetaOnly() {
         Somente usuários beta podem acessar o dashboard.
       </EmptyPlaceholder.Description>
 
-      <Button onClick={() => push('/')}>Voltar a página inicial</Button>
+      <div className="flex items-center gap-2">
+        <Button onClick={() => push('/')}>Voltar a página inicial</Button>
+        <Button
+          onClick={() =>
+            signOut({
+              callbackUrl: '/signin',
+            })
+          }
+          variant="outline"
+        >
+          Desconectar-se
+        </Button>
+      </div>
     </EmptyPlaceholder>
   )
 }
