@@ -69,9 +69,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       callbackUrl: searchParams?.get('from') || '/dashboard',
     })
 
-    setIsLoading(false)
-
     if (!signInResult?.ok) {
+      setIsLoading(false)
       return toast({
         title: 'Ups! Algo deu errado',
         description: 'Verifique suas credenciais e tente novamente.',
